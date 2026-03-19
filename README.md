@@ -37,7 +37,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Then set up the project:
 
 ```bash
-uv init
+uv init --bare
 uv add pydantic ragbits ragbits-agents "ragbits[qdrant]"
 
 # For the MCP exercise (lesson 04):

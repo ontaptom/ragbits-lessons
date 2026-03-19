@@ -114,7 +114,7 @@ pip install pydantic
 **Using uv:**
 ```bash
 # uv handles the virtual environment for you - no manual venv needed
-uv init
+uv init --bare
 uv add pydantic
 
 # Later lessons will need ragbits - you can add them now or wait:
