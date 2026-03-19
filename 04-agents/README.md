@@ -85,7 +85,7 @@ pip install mcp-server-fetch
 ```python
 from ragbits.agents.mcp import MCPServerStdio
 
-server = MCPServerStdio(command="python", args=["-m", "mcp_server_fetch"])
+server = MCPServerStdio(params={"command": "python", "args": ["-m", "mcp_server_fetch"]})
 ```
 
 #### 2. SSE - remote server over Server-Sent Events

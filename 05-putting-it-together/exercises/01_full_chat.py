@@ -29,7 +29,7 @@ from ragbits.chat.interface.ui_customization import (
 )
 from ragbits.core.embeddings import LiteLLMEmbedder
 from ragbits.core.llms import LiteLLM, ToolCall
-from ragbits.core.prompt import Prompt
+from ragbits.core.prompt import ChatFormat, Prompt
 from ragbits.core.vector_stores import InMemoryVectorStore
 from ragbits.document_search import DocumentSearch
 from ragbits.document_search.documents.element import Element
@@ -212,7 +212,7 @@ def get_birthday(name: str) -> str:
 #     async def chat(
 #         self,
 #         message: str,
-#         history: list,
+#         history: ChatFormat,
 #         context: ChatContext,
 #     ) -> AsyncGenerator[ChatResponse, None]:
 #         # Get language from settings (if you set up WorkshopSettings)

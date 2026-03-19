@@ -50,7 +50,7 @@ async def main() -> None:
     # Remember: async with goes on the server (manages the child process),
     # then create the agent inside that block.
     #
-    # server = MCPServerStdio(command="python", args=["-m", "mcp_server_fetch"])
+    # server = MCPServerStdio(params={"command": "python", "args": ["-m", "mcp_server_fetch"]})
     # async with server:
     #     agent = Agent(
     #         llm=LiteLLM(model_name=MODEL),

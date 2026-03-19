@@ -18,6 +18,7 @@ from collections.abc import AsyncGenerator
 from pydantic import BaseModel
 from ragbits.chat.interface import ChatInterface
 from ragbits.chat.interface.types import ChatContext, ChatResponse
+from ragbits.core.prompt import ChatFormat
 from ragbits.chat.interface.ui_customization import (
     HeaderCustomization,
     UICustomization,
@@ -60,7 +61,7 @@ from ragbits.core.prompt import Prompt
 #     async def chat(
 #         self,
 #         message: str,
-#         history: list,
+#         history: ChatFormat,
 #         context: ChatContext,
 #     ) -> AsyncGenerator[ChatResponse, None]:
 #         prompt = MyChatPrompt(ChatInput(question=message))
