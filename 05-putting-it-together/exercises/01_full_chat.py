@@ -14,7 +14,9 @@ import sys
 from collections.abc import AsyncGenerator, Sequence
 from typing import Literal
 
-sys.path.append("../..")
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 from config import MODEL, EMBEDDING_MODEL
 
 from pydantic import BaseModel, ConfigDict, Field

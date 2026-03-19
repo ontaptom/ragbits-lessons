@@ -8,8 +8,9 @@ Then open http://127.0.0.1:8000 in your browser.
 """
 
 import sys
+from pathlib import Path
 
-sys.path.append("../..")
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 from config import MODEL
 
 from collections.abc import AsyncGenerator

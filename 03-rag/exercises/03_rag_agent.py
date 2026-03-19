@@ -12,8 +12,9 @@ Make sure you ran 01_ingest.py first (we need the vector index).
 import asyncio
 import sys
 from collections.abc import Sequence
+from pathlib import Path
 
-sys.path.append("../..")
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 from config import MODEL, MODEL_SMART, EMBEDDING_MODEL
 
 from pydantic import BaseModel

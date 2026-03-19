@@ -12,8 +12,9 @@ answer quality requires a more capable model than generating answers.
 
 import asyncio
 import sys
+from pathlib import Path
 
-sys.path.append("../..")
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 from config import MODEL, MODEL_SMART
 
 from pydantic import BaseModel

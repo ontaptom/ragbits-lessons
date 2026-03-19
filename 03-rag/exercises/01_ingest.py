@@ -12,8 +12,9 @@ The ingestion takes about 2 minutes - grab a coffee.
 import asyncio
 import json
 import sys
+from pathlib import Path
 
-sys.path.append("../..")
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 from config import EMBEDDING_MODEL
 
 from ragbits.core.embeddings import LiteLLMEmbedder

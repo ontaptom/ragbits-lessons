@@ -10,8 +10,9 @@ Run:  python 01_tool_calling.py
 import asyncio
 import json
 import sys
+from pathlib import Path
 
-sys.path.append("../..")
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 from config import MODEL
 
 from pydantic import BaseModel

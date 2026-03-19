@@ -9,8 +9,9 @@ Run:  python 02_search.py
 
 import asyncio
 import sys
+from pathlib import Path
 
-sys.path.append("../..")
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 from config import EMBEDDING_MODEL
 
 from ragbits.core.embeddings import LiteLLMEmbedder
