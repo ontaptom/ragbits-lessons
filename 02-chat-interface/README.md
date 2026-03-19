@@ -28,11 +28,16 @@ class MyChat(ChatInterface):
         yield self.create_text_response("Hello! You said: " + message)
 ```
 
-That's it. Seriously. You run it with:
+That's it. Seriously. Save it as `my_chat.py` and run it with:
 
 ```bash
 ragbits api run my_chat:MyChat
+# or with uv: uv run ragbits api run my_chat:MyChat
 ```
+
+The syntax is `filename:ClassName` - so `my_chat:MyChat` means "from
+`my_chat.py`, load the `MyChat` class". Same idea as `uvicorn main:app`
+if you've seen that before.
 
 And you get a full chat UI in your browser.
 
@@ -109,6 +114,7 @@ Unlike previous exercises, chat interfaces are started differently:
 ```bash
 cd exercises
 ragbits api run 01_basic_chat:MyChat
+# or with uv: uv run ragbits api run 01_basic_chat:MyChat
 ```
 
 Then open the URL shown in the terminal (usually http://127.0.0.1:8000).
