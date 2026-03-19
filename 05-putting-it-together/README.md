@@ -102,6 +102,7 @@ Qdrant index for a bigger knowledge base.
 ```bash
 cd exercises
 ragbits api run 01_full_chat:WorkshopChat
+# or with uv: uv run ragbits api run 01_full_chat:WorkshopChat
 ```
 
 ## Further reading

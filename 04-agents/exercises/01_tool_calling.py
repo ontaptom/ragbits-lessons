@@ -26,7 +26,16 @@ from ragbits.core.prompt import Prompt
 # Here's an example tool. In a real app this would call an actual API.
 
 def search_flights(departure: str, destination: str) -> str:
-    """Search for available flights between two cities."""
+    """
+    Search for available flights between two cities.
+
+    Args:
+        departure: The city to depart from, e.g. 'New York', 'London'.
+        destination: The city to fly to, e.g. 'Paris', 'Tokyo'.
+
+    Returns:
+        A JSON string with flight details or a message if no flights found.
+    """
     # Fake flight data - in production you'd call a flight API
     flights = {
         ("new york", "paris"): [

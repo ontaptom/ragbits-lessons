@@ -79,11 +79,13 @@ Each lesson folder has:
 Most exercises run with:
 ```bash
 python exercises/01_something.py
+# or with uv: uv run python exercises/01_something.py
 ```
 
 Chat interface exercises run with:
 ```bash
 ragbits api run exercises/01_something:ClassName
+# or with uv: uv run ragbits api run exercises/01_something:ClassName
 ```
 
 ## Provider config

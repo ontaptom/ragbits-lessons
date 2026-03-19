@@ -38,7 +38,12 @@ A tool is just a Python function with type hints and a docstring:
 
 ```python
 def get_weather(city: str) -> str:
-    """Get current weather for a city."""
+    """
+    Returns the current weather for a given city.
+
+    Args:
+        city: The city to get the weather for.
+    """
     # In real life, call a weather API here
     return f"Weather in {city}: 15C, partly cloudy"
 ```

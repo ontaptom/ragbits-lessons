@@ -91,12 +91,55 @@ class ChatInput(BaseModel):
 #     """
 
 
-# TODO 4 (optional): Define a custom tool for your agent.
-# For example:
-#
-# def explain_java_in_python(java_code: str) -> str:
-#     """Explain what this Java code does and show the Python equivalent."""
-#     return f"Please explain this Java code and show the Python version:\n{java_code}"
+# --- Some example tools for the agent ---
+
+from datetime import datetime, timezone as tz
+
+
+def get_current_date() -> str:
+    """
+    Returns today's date in YYYY-MM-DD format.
+    """
+    return datetime.now(tz.utc).strftime("%Y-%m-%d")
+
+
+def get_current_time(timezone: str = "UTC") -> str:
+    """
+    Returns the current time in a given timezone.
+
+    Args:
+        timezone: IANA timezone name, e.g. 'UTC', 'US/Eastern', 'Europe/Warsaw', 'Asia/Tokyo'.
+    """
+    from zoneinfo import ZoneInfo
+    try:
+        now = datetime.now(ZoneInfo(timezone))
+        return f"{now.strftime('%H:%M:%S')} ({timezone})"
+    except KeyError:
+        return f"Unknown timezone: {timezone}"
+
+
+def get_birthday(name: str) -> str:
+    """
+    Looks up a person's birthday by their first name.
+    Known names: Alice, Bob, Charlie, Diana.
+
+    Args:
+        name: First name to look up. Case-insensitive.
+    """
+    birthdays = {
+        "alice": "March 15, 1990",
+        "bob": "July 4, 1988",
+        "charlie": "December 24, 1995",
+        "diana": "September 1, 1992",
+    }
+    result = birthdays.get(name.lower())
+    if result:
+        return f"{name}'s birthday is {result}"
+    return f"I don't have birthday info for {name}"
+
+
+# TODO 4 (optional): Add your own tool function!
+# Remember: type hints + docstring = the LLM knows how to use it.
 
 
 # ============================================================
@@ -157,7 +200,7 @@ class ChatInput(BaseModel):
 #         self.agent = Agent(
 #             llm=self.llm,
 #             prompt=WorkshopPrompt,
-#             tools=[],  # add your tools here
+#             tools=[get_current_date, get_current_time, get_birthday],
 #         )
 #
 #     async def setup_chat(self):
