@@ -16,7 +16,6 @@ from config import MODEL
 from collections.abc import AsyncGenerator
 
 from pydantic import BaseModel
-from ragbits.agents import Agent
 from ragbits.chat.interface import ChatInterface
 from ragbits.chat.interface.types import ChatContext, ChatResponse
 from ragbits.chat.interface.ui_customization import (
@@ -27,37 +26,27 @@ from ragbits.core.llms import LiteLLM
 from ragbits.core.prompt import Prompt
 
 
-# --- Step 1: Define a prompt ---
-
-class ChatInput(BaseModel):
-    question: str
-
-
-# TODO 1: Create a prompt class for the chat.
-# Keep it simple - a system prompt that sets the personality,
-# and a user prompt that passes through the question.
+# TODO 1: Build a ChatInterface class called MyChat.
 #
-# Some fun ideas for the system prompt:
+# You need:
+#   a) A prompt class (same pattern as lesson 01 - input model, system prompt, user prompt)
+#   b) A ChatInterface subclass that creates an LLM in __init__,
+#      and in chat() generates a response and yields it
+#   c) UI customization with a title and welcome message
+#
+# Pick a fun personality for your system prompt:
 #   - A pirate that only talks about technology
 #   - A sarcastic Python teacher for Java developers
 #   - A very enthusiastic hiking guide
 #
+# Skeleton:
+#
+# class ChatInput(BaseModel):
+#     question: str
+#
 # class MyChatPrompt(Prompt[ChatInput, str]):
 #     system_prompt = "..."
 #     user_prompt = "{{ question }}"
-
-
-# --- Step 2: Build the chat interface ---
-
-# TODO 2: Create a ChatInterface class called MyChat
-#
-# It should:
-#   a) Have a ui_customization with a title and welcome_message
-#   b) In __init__, create an Agent with your prompt and an LLM
-#   c) In the chat() method, use self.agent.run_streaming() and
-#      yield text responses
-#
-# Skeleton:
 #
 # class MyChat(ChatInterface):
 #     ui_customization = UICustomization(
@@ -66,10 +55,7 @@ class ChatInput(BaseModel):
 #     )
 #
 #     def __init__(self):
-#         self.agent = Agent(
-#             llm=LiteLLM(model_name=MODEL),
-#             prompt=MyChatPrompt,
-#         )
+#         self.llm = LiteLLM(model_name=MODEL)
 #
 #     async def chat(
 #         self,
@@ -77,7 +63,21 @@ class ChatInput(BaseModel):
 #         history: list,
 #         context: ChatContext,
 #     ) -> AsyncGenerator[ChatResponse, None]:
-#         stream = self.agent.run_streaming(ChatInput(question=message))
-#         async for chunk in stream:
-#             if isinstance(chunk, str) and chunk.strip():
-#                 yield self.create_text_response(chunk)
+#         prompt = MyChatPrompt(ChatInput(question=message))
+#         response = await self.llm.generate(prompt)
+#         yield self.create_text_response(str(response))
+
+
+# TODO 2 (bonus): Once it works, try upgrading to streaming responses.
+# You'll need Agent from ragbits.agents:
+#
+#   from ragbits.agents import Agent
+#
+#   self.agent = Agent(llm=LiteLLM(model_name=MODEL), prompt=MyChatPrompt)
+#
+# Then in chat(), replace llm.generate with:
+#
+#   stream = self.agent.run_streaming(ChatInput(question=message))
+#   async for chunk in stream:
+#       if isinstance(chunk, str) and chunk.strip():
+#           yield self.create_text_response(chunk)

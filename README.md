@@ -20,8 +20,8 @@ source .venv/bin/activate
 
 pip install -U pydantic ragbits ragbits-agents "ragbits[qdrant]"
 
-# For the MCP exercise (lesson 04):
-pip install mcp-server-fetch
+# For MCP exercises (lesson 04):
+pip install mcp mcp-server-fetch
 ```
 
 ### Option B: Using uv
@@ -40,8 +40,8 @@ Then set up the project:
 uv init --bare
 uv add pydantic ragbits ragbits-agents "ragbits[qdrant]"
 
-# For the MCP exercise (lesson 04):
-uv add mcp-server-fetch
+# For MCP exercises (lesson 04):
+uv add mcp mcp-server-fetch
 ```
 
 With uv, you run scripts using `uv run` instead of `python` directly:

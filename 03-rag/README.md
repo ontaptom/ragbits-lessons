@@ -27,45 +27,65 @@ User question
 
 ### Document ingestion
 
-Before you can search documents, you need to get them into a vector database.
+Before you can search documents, you need to get them into a vector store.
 The pipeline looks like this:
 
 1. **Load** - get documents from somewhere (files, URLs, APIs)
 2. **Parse** - extract text from documents (PDF, JSONL, HTML, etc.)
 3. **Embed** - turn text into vector embeddings
-4. **Store** - save embeddings in a vector database
+4. **Store** - save embeddings in a vector store
 
-Ragbits handles all of this through `DocumentSearch`:
+Ragbits handles all of this through `DocumentSearch`.
+
+### The simplest version - in-memory
+
+For quick experiments, you can use `InMemoryVectorStore` - no external
+database needed. Everything lives in RAM and disappears when the script ends:
+
+```python
+from ragbits.core.embeddings import LiteLLMEmbedder
+from ragbits.core.vector_stores import InMemoryVectorStore
+from ragbits.document_search import DocumentSearch
+
+embedder = LiteLLMEmbedder(model_name="text-embedding-3-small")
+vector_store = InMemoryVectorStore(embedder=embedder)
+document_search = DocumentSearch(vector_store=vector_store)
+
+# Ingest a PDF from the web
+await document_search.ingest("web://https://arxiv.org/pdf/1706.03762")
+
+# Search
+results = await document_search.search("what is a transformer?")
+```
+
+### Scaling up with Qdrant
+
+For real projects, you want persistent storage. Qdrant is a vector database
+that can run locally (as a file) or as a server:
 
 ```python
 from qdrant_client import AsyncQdrantClient
-from ragbits.core.embeddings import LiteLLMEmbedder
 from ragbits.core.vector_stores.qdrant import QdrantVectorStore
-from ragbits.document_search import DocumentSearch
 
 retriever = DocumentSearch(
     vector_store=QdrantVectorStore(
-        client=AsyncQdrantClient(path="./my_index"),  # local storage
+        client=AsyncQdrantClient(path="./my_index"),  # local file storage
         embedder=LiteLLMEmbedder(model_name="text-embedding-3-small"),
         index_name="my_docs",
     ),
 )
-
-# Ingest from a URL
-await retriever.ingest("web://https://example.com/data.jsonl")
-
-# Search
-results = await retriever.search("how does memory management work?")
 ```
 
 ### Custom document parsers
 
-If your data is in a non-standard format, you can write a custom parser:
+If your data is in a non-standard format, you can write a custom parser.
+Then use a `DocumentParserRouter` to tell ragbits which parser to use
+for which file type:
 
 ```python
 from ragbits.document_search.documents.document import Document, DocumentType
 from ragbits.document_search.documents.element import Element, TextElement
-from ragbits.document_search.ingestion.parsers import DocumentParser
+from ragbits.document_search.ingestion.parsers import DocumentParser, DocumentParserRouter
 
 class MyParser(DocumentParser):
     supported_document_types = {DocumentType.JSONL}
@@ -73,6 +93,25 @@ class MyParser(DocumentParser):
     async def parse(self, document: Document) -> list[Element]:
         # Read the file, split into elements
         ...
+
+# Wire it up
+router = DocumentParserRouter({DocumentType.JSONL: MyParser()})
+retriever = DocumentSearch(..., parser_router=router)
+```
+
+### Batched ingestion
+
+When ingesting a large corpus, you probably don't want to embed
+one document at a time. `BatchedIngestStrategy` groups documents
+into batches for more efficient processing:
+
+```python
+from ragbits.document_search.ingestion.strategies import BatchedIngestStrategy
+
+retriever = DocumentSearch(
+    ...,
+    ingest_strategy=BatchedIngestStrategy(index_batch_size=1000),
+)
 ```
 
 ### Connecting retrieval to generation
@@ -109,9 +148,10 @@ class RAGAgent(QuestionAnswerAgent):
 
 ## Exercises
 
-1. **[exercises/01_ingest.py](exercises/01_ingest.py)** - Ingest documents into a vector store
-2. **[exercises/02_search.py](exercises/02_search.py)** - Search and inspect retrieved results
-3. **[exercises/03_rag_agent.py](exercises/03_rag_agent.py)** - Build a full RAG pipeline and evaluate it
+1. **[exercises/01_simple_rag.py](exercises/01_simple_rag.py)** - Your first RAG pipeline - ingest, search, and generate (all in-memory)
+2. **[exercises/02_ingest.py](exercises/02_ingest.py)** - Ingest a larger corpus into Qdrant
+3. **[exercises/03_search.py](exercises/03_search.py)** - Search and inspect retrieved results
+4. **[exercises/04_rag_agent.py](exercises/04_rag_agent.py)** - Build a full RAG agent and evaluate it
 
 ## Further reading
 

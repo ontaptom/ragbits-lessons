@@ -93,6 +93,10 @@ class MyChat(ChatInterface):
 This is the big one - it brings together everything from the workshop.
 Take your time with it, and don't hesitate to look back at previous lessons.
 
+The exercise works standalone using an in-memory vector store. If you
+completed lesson 03's ingestion exercise, you can optionally swap to the
+Qdrant index for a bigger knowledge base.
+
 ## Running it
 
 ```bash

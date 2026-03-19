@@ -45,19 +45,21 @@ class ResearchInput(BaseModel):
 async def main() -> None:
     # --- Step 2: Create the agent with MCP ---
 
-    # TODO 2: Create an agent that uses the mcp-server-fetch MCP server.
+    # TODO 2: Create the MCP server and agent, then test it.
     # The MCP server gives the agent a `fetch` tool for reading web pages.
+    # Remember: async with goes on the server (manages the child process),
+    # then create the agent inside that block.
     #
-    # agent = Agent(
-    #     llm=LiteLLM(model_name=MODEL),
-    #     prompt=ResearchPrompt,
-    #     mcp_servers=[
-    #         MCPServerStdio(command="python", args=["-m", "mcp_server_fetch"]),
-    #     ],
-    # )
+    # server = MCPServerStdio(command="python", args=["-m", "mcp_server_fetch"])
+    # async with server:
+    #     agent = Agent(
+    #         llm=LiteLLM(model_name=MODEL),
+    #         prompt=ResearchPrompt,
+    #         mcp_servers=[server],
+    #     )
 
     # TODO 3: Test it! Ask something that requires looking up info online.
-    # async with agent:
+    # (still inside the async with block)
     #     result = await agent.run(ResearchInput(
     #         question="What is ragbits? Look up https://ragbits.deepsense.ai/ and summarize it."
     #     ))
@@ -65,6 +67,22 @@ async def main() -> None:
 
     # TODO 4 (bonus): Try asking it to compare two web pages, or to
     # look up something specific from a documentation site.
+
+    # --- Note: MCPServerStdio vs remote MCP servers ---
+    #
+    # Here we use MCPServerStdio which spawns the server as a local child process.
+    # In production, MCP servers usually run independently (their own container,
+    # their own process, their own host) and you connect to them over HTTP:
+    #
+    #   from ragbits.agents.mcp import MCPServerSse, MCPServerStreamableHttp
+    #
+    #   # Connect to an MCP server running over SSE:
+    #   MCPServerSse(params={"url": "http://localhost:8080/sse"})
+    #
+    #   # Or using the newer Streamable HTTP transport:
+    #   MCPServerStreamableHttp(params={"url": "http://localhost:8080/mcp"})
+    #
+    # Same agent code, same tools - just a different transport.
     pass
 
 

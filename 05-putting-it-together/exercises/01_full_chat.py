@@ -6,8 +6,6 @@ This is the capstone exercise - take your time and refer back to earlier lessons
 
 Run:  ragbits api run 01_full_chat:WorkshopChat
 Then open http://127.0.0.1:8000 in your browser.
-
-Note: If you want RAG support, make sure you ran 03-rag/exercises/01_ingest.py first.
 """
 
 import sys
@@ -29,15 +27,16 @@ from ragbits.chat.interface.ui_customization import (
     PageMetaCustomization,
     UICustomization,
 )
+from ragbits.core.embeddings import LiteLLMEmbedder
 from ragbits.core.llms import LiteLLM, ToolCall
 from ragbits.core.prompt import Prompt
+from ragbits.core.vector_stores import InMemoryVectorStore
+from ragbits.document_search import DocumentSearch
+from ragbits.document_search.documents.element import Element
 
-# Uncomment these if you want RAG support (needs 03-rag/exercises/01_ingest.py run first):
-# from ragbits.core.embeddings import LiteLLMEmbedder
+# Uncomment these if you completed lesson 03 and want to use the Qdrant index:
 # from ragbits.core.vector_stores import VectorStoreOptions
 # from ragbits.core.vector_stores.qdrant import QdrantVectorStore
-# from ragbits.document_search import DocumentSearch
-# from ragbits.document_search.documents.element import Element
 # from qdrant_client import AsyncQdrantClient
 
 
@@ -74,13 +73,12 @@ from ragbits.core.prompt import Prompt
 class ChatInput(BaseModel):
     question: str
     language: str = "English"
-    # Uncomment for RAG:
-    # context: Sequence[Element] | None = None
+    context: Sequence[Element] | None = None
 
 
 # TODO 3: Create a prompt class for the chat agent.
 # Include the language variable in the system prompt.
-# If using RAG, include context in the user prompt.
+# Include context in the user prompt for RAG support.
 #
 # class WorkshopPrompt(Prompt[ChatInput, str]):
 #     system_prompt = """
@@ -88,13 +86,9 @@ class ChatInput(BaseModel):
 #     If context is provided, base your answer on it.
 #     """
 #     user_prompt = """
-#     {{ question }}
+#     Question: {{ question }}
+#     {% if context %}Context: {% for c in context %}{{ c.text_representation }}{% endfor %}{% endif %}
 #     """
-#     # For RAG, change user_prompt to:
-#     # user_prompt = """
-#     # Question: {{ question }}
-#     # {% if context %}Context: {% for c in context %}{{ c.text_representation }}{% endfor %}{% endif %}
-#     # """
 
 
 # TODO 4 (optional): Define a custom tool for your agent.
@@ -141,12 +135,20 @@ class ChatInput(BaseModel):
 #
 #     def __init__(self):
 #         self.llm = LiteLLM(model_name=MODEL)
+#         embedder = LiteLLMEmbedder(model_name=EMBEDDING_MODEL)
 #
-#         # Uncomment for RAG:
+#         # Option A: InMemoryVectorStore - works standalone, no setup needed.
+#         # Ingest a document in setup_chat() below.
+#         self.retriever = DocumentSearch(
+#             vector_store=InMemoryVectorStore(embedder=embedder),
+#         )
+#
+#         # Option B: Qdrant - if you completed lesson 03's 02_ingest.py,
+#         # you can use the pre-built index instead (uncomment and swap):
 #         # self.retriever = DocumentSearch(
 #         #     vector_store=QdrantVectorStore(
-#         #         client=AsyncQdrantClient(path="../../../03-rag/exercises/ragqa_arena_tech_corpus"),
-#         #         embedder=LiteLLMEmbedder(model_name=EMBEDDING_MODEL),
+#         #         client=AsyncQdrantClient(path="../../03-rag/exercises/ragqa_arena_tech_corpus"),
+#         #         embedder=embedder,
 #         #         default_options=VectorStoreOptions(k=5),
 #         #         index_name="ragqa_arena_tech_corpus",
 #         #     ),
@@ -157,6 +159,12 @@ class ChatInput(BaseModel):
 #             prompt=WorkshopPrompt,
 #             tools=[],  # add your tools here
 #         )
+#
+#     async def setup_chat(self):
+#         # Only needed for Option A (InMemoryVectorStore).
+#         # Ingest a small document so RAG has something to search.
+#         # Feel free to change the URL to something more interesting!
+#         await self.retriever.ingest("web://https://arxiv.org/pdf/1706.03762")
 #
 #     async def chat(
 #         self,
@@ -169,14 +177,14 @@ class ChatInput(BaseModel):
 #         # if context and context.user_settings:
 #         #     language = context.user_settings.get("language", "English")
 #
-#         # Optional: retrieve context for RAG
-#         # search_results = await self.retriever.search(message)
+#         # Retrieve context for RAG
+#         search_results = await self.retriever.search(message)
 #
 #         # Build input
 #         chat_input = ChatInput(
 #             question=message,
 #             language=language,
-#             # context=search_results,  # uncomment for RAG
+#             context=search_results,
 #         )
 #
 #         # Stream the response
