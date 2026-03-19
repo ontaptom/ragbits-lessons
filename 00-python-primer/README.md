@@ -74,6 +74,25 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
+When you have multiple async calls to make, you can run them
+concurrently with `asyncio.gather()` - think of it like
+`CompletableFuture.allOf()`:
+
+```python
+async def fetch_all() -> None:
+    # These run concurrently, not one after another
+    results = await asyncio.gather(
+        fetch_data(),
+        fetch_data(),
+        fetch_data(),
+    )
+    print(results)  # ["done", "done", "done"]
+```
+
+This is useful when you need to make multiple independent LLM calls
+or API requests - instead of waiting for each one sequentially, they
+all run at the same time.
+
 ### The `if __name__ == "__main__"` pattern
 
 You'll see this in every exercise file. It's Python's way of saying
